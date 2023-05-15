@@ -4,10 +4,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <netdb.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <sys/socket.h>
+
 #include <rdma/fabric.h>
 #include <rdma/fi_errno.h>
 #include <rdma/fi_rma.h>
 #include <rdma/fi_domain.h>
+#include <rdma/fi_cm.h>
+#include <rdma/fi_eq.h>
+
+#define DEFAULT_RDMA_PORT (20886)
+#define TIMEOUT (20000) /* in ms */
+#define BUFFER_SIZE (1024)
 
 /* error Macro*/
 #define error(msg, args...) do {\
@@ -23,35 +34,7 @@
 }while(0);
 
 
-void freehints(struct fi_info *hints)
-{
-	if (!hints)
-		return;
-
-	if (hints->domain_attr->name) {
-		free(hints->domain_attr->name);
-		hints->domain_attr->name = NULL;
-	}
-	if (hints->fabric_attr->name) {
-		free(hints->fabric_attr->name);
-		hints->fabric_attr->name = NULL;
-	}
-	if (hints->fabric_attr->prov_name) {
-		free(hints->fabric_attr->prov_name);
-		hints->fabric_attr->prov_name = NULL;
-	}
-	if (hints->src_addr) {
-		free(hints->src_addr);
-		hints->src_addr = NULL;
-		hints->src_addrlen = 0;
-	}
-	if (hints->dest_addr) {
-		free(hints->dest_addr);
-		hints->dest_addr = NULL;
-		hints->dest_addrlen = 0;
-	}
-
-	fi_freeinfo(hints);
-}
+void freehints(struct fi_info *hints);
+int get_addr(char *dst, struct sockaddr *addr);
 
 #endif
